@@ -1,18 +1,37 @@
 import React, { useState } from 'react'
-import {Link, Switch, Route} from 'react-router-dom'
+import {Link, Switch, Route, useParams} from 'react-router-dom'
 
-// const Menu = () => {
-//   
-//   return (
-    
-//   )
-// }
+const Menu = () => {
+  const padding = {
+    paddingRight: 5
+  }
+  return (
+    <div>
+      <h1>Software anecdotes</h1>
+      <Link to="/anecdotes" style={padding}>anecdotes</Link>
+      <Link to="/newAnec" style={padding}>create new</Link>
+      <Link to="/about" style={padding}>about</Link>
+    </div>
+  )
+}
+
+const Anecdote = ({anecdotes}) => {
+  const id = useParams().id
+  const foundAnec = anecdotes.find(anecdote => anecdote.id === id) 
+  return (
+    <div>
+      <h2>{foundAnec.content} by {foundAnec.author}</h2>
+      <p>has {foundAnec.votes} votes</p>
+      <p>For more info, see {foundAnec.info}</p>
+    </div>
+  )
+}
 
 const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
     <ul>
-      {anecdotes.map(anecdote => <li key={anecdote.id} >{anecdote.content}</li>)}
+      {anecdotes.map(anecdote => <li key={anecdote.id}><Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link></li>)}
     </ul>
   </div>
 )
@@ -116,18 +135,9 @@ const App = () => {
     setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
   }
 
-  const padding = {
-    paddingRight: 5
-  }
-
   return (
     <div>
-      <div>
-        <h1>Software anecdotes</h1>
-        <Link to="/anecdotes" style={padding}>anecdotes</Link>
-        <Link to="/newAnec" style={padding}>create new</Link>
-        <Link to="/about" style={padding}>about</Link>
-      </div>
+      <Menu />
       <Switch>
         <Route path="/newAnec">
           <CreateNew addNew={addNew} />
@@ -135,9 +145,12 @@ const App = () => {
         <Route path="/about">
           <About />
         </Route>
+        <Route path="/anecdotes/:id">
+          <Anecdote anecdotes={anecdotes} />
+        </Route>
         <Route path="/anecdotes">
           <AnecdoteList anecdotes={anecdotes} />
-        </Route>
+        </Route>   
         <Route path="/">
           <AnecdoteList anecdotes={anecdotes} />
         </Route>
