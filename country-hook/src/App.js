@@ -1,7 +1,39 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
+const useField = (type) => {
+  const [value, setValue] = useState('')
+
+  const onChange = (event) => {
+    setValue(event.target.value)
+  }
+
+  return {
+    type,
+    value,
+    onChange
+  }
+}
+
+const useCountry = (name) => {
+  const [country, setCountry] = useState(null)
+  
+  useEffect(() => {
+    if(name === '') return null
+    axios.get(`https://restcountries.com/v2/name/${name}`).then(response =>
+      setCountry(response.data[0])
+    )
+  }, [name])
+
+  return country
+}
+
 const Country = ({ country }) => {
+  if(!country) {
+    return (
+      <p>Not found...</p>
+    )
+  }
   return (
     <div>
       <h3>{country.name} </h3>
@@ -13,23 +45,24 @@ const Country = ({ country }) => {
 }
 
 const App = () => {
-  const [country, setCountry] = useState(null)
-  useEffect(() => {
-    axios.get(`https://restcountries.com/v2/name/peru`).then(response =>
-      // console.log(response.data[0])
-      setCountry(response.data[0])
-    )
-  }, [])
-  // console.log(country)
+  const nameInput = useField('text')
+  const [name, setName] = useState('')
+  const country = useCountry(name)
+
+  const fetch = (e) => {
+    e.preventDefault()
+    setName(nameInput.value)
+  }
 
   return (
-    <>
-    {country ? 
     <div>
+      <form onSubmit={fetch}>
+        <input {...nameInput} />
+        <button>find</button>
+      </form>
+
       <Country country={country} />
-    </div> : null 
-    }
-    </>
+    </div>
   )
 }
 
