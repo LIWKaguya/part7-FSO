@@ -1,7 +1,9 @@
 import '../index.css'
 import React from 'react'
+import { useSelector } from 'react-redux'
 
-export const SuscessMessage = ({ suscessMessage }) => {
+export const SuscessMessage = () => {
+  const suscessMessage = useSelector(state => state.suscessMess)
   if(suscessMessage === null) return null
   return (
     <div className="suscess">
@@ -11,7 +13,7 @@ export const SuscessMessage = ({ suscessMessage }) => {
 }
 
 export const ErrorMessage = ({ errorMessage }) => {
-  if(errorMessage === null) return null
+  if(errorMessage === '') return null
   return (
     <div className="error">
       {errorMessage}

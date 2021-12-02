@@ -1,20 +1,23 @@
 import './index.css'
 import React, { useState, useEffect, useRef } from 'react'
+import { useDispatch } from 'react-redux'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Togglable from './components/Togglable'
 import { SuscessMessage, ErrorMessage } from './components/Notification'
+import { suscessNotification } from './reducers/suscessReducer'
 
 
 const App = () => {
+  const dispatch = useDispatch()
+
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [errorMessage, setErrorMessage] = useState(null)
-  const [suscessMessage, setSuscessMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const blogFormRef = useRef()
 
@@ -45,8 +48,7 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
     const returnedBlog = await blogService.upload(blogObj)
     setBlogs(blogs.concat(returnedBlog))
-    setSuscessMessage(`a new blog ${returnedBlog.title} by ${returnedBlog.author} has been added`)
-    setTimeout(() => {setSuscessMessage(null)}, 5000)
+    dispatch(suscessNotification(`a new blog ${returnedBlog.title} by ${returnedBlog.author} has been added`, 5000))
   }
   const updateBlog = async blogObj => {
     const updatedBlog = await blogService.update(blogObj)
@@ -112,7 +114,7 @@ const App = () => {
   }
   return (
     <div>
-      <SuscessMessage suscessMessage={suscessMessage} />
+      <SuscessMessage />
       <h2>blogs</h2>
       {user.username} logged in
       <button id='logout' onClick={() => {
@@ -120,7 +122,7 @@ const App = () => {
         setUser(null)
       }}>log out</button>
       <Togglable buttonLabel='create new blog' cancelLabel='cancel' ref={blogFormRef}>
-        <BlogForm addBlog={addBlog} suscessMessage={suscessMessage}/>
+        <BlogForm addBlog={addBlog} />
       </Togglable>
       {blogs.map(blog =>
         <div key={blog.id} className='blog'>
