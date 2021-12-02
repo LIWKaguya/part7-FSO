@@ -3,10 +3,12 @@ import thunk from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import suscessReducer from './reducers/suscessReducer'
 import errorReducer from './reducers/errorReducer'
+import blogsReducer from './reducers/blogsReducer'
 
 const reducers = combineReducers({
   suscessMess: suscessReducer,
-  errorMess: errorReducer
+  errorMess: errorReducer,
+  blogs: blogsReducer
 })
 
 const store = createStore(

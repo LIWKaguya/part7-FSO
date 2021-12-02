@@ -11,8 +11,14 @@ const getAll = () => {
   return request.then(response => response.data)
 }
 
-const update = async object => {
-  const response = await axios.put(`${baseUrl}/${object.id}`, object)
+const getOne = async object => {
+  const response = await axios.get(`${baseUrl}/${object.id}`)
+  return response.data
+}
+
+const likeBlog = async object => {
+  const updated = { ...object, likes: object.likes+1 }
+  const response = await axios.put(`${baseUrl}/${object.id}`, updated)
   return response.data
 }
 
@@ -35,5 +41,5 @@ const clearOut = async object => {
   }
 }
 
-const object = { getAll, setToken, upload, update, clearOut }
+const object = { getAll, setToken, upload, likeBlog, clearOut, getOne }
 export default object

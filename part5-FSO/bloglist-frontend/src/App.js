@@ -1,6 +1,6 @@
 import './index.css'
 import React, { useState, useEffect, useRef } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
@@ -9,12 +9,12 @@ import Togglable from './components/Togglable'
 import { SuscessMessage, ErrorMessage } from './components/Notification'
 import { suscessNotification } from './reducers/suscessReducer'
 import { errorNotification } from './reducers/errorReducer'
+import { initBlogs, likeBlog, removeBlog, createBlog } from './reducers/blogsReducer'
 
 
 const App = () => {
   const dispatch = useDispatch()
-
-  const [blogs, setBlogs] = useState([])
+  const blogs = useSelector(state => state.blogs)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -23,10 +23,8 @@ const App = () => {
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )
-  }, [])
+    dispatch(initBlogs())
+  }, [dispatch])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogsUser')
@@ -45,21 +43,20 @@ const App = () => {
 
   blogs.sort(comp)
 
-  const addBlog = async (blogObj) => {
+  const addBlog = blogObj => {
     blogFormRef.current.toggleVisibility()
-    const returnedBlog = await blogService.upload(blogObj)
-    setBlogs(blogs.concat(returnedBlog))
-    dispatch(suscessNotification(`a new blog ${returnedBlog.title} by ${returnedBlog.author} has been added`, 5000))
+    dispatch(createBlog(blogObj))
+    dispatch(suscessNotification(`a new blog ${blogObj.title} by ${blogObj.author} has been added`, 5000))
   }
-  const updateBlog = async blogObj => {
-    const updatedBlog = await blogService.update(blogObj)
-    setBlogs(blogs.map(blog => blog.id !== updatedBlog.id ? blog : updatedBlog))
+  const updateBlog = blogObj => {
+    dispatch(likeBlog(blogObj.id))
   }
 
   const deleteBlog = async blogObj => {
-    const avoid = blogObj.id
-    await blogService.clearOut(blogObj)
-    setBlogs(blogs.filter(blog => blog.id !== avoid))
+    const id = blogObj.id
+    const deletedOne = await blogService.getOne({ id })
+    dispatch(removeBlog(blogObj.id))
+    dispatch(suscessNotification(`blog ${deletedOne.title} by ${deletedOne.author} has been deleted`, 5000))
   }
 
   const handleLogin = async (event) => {
