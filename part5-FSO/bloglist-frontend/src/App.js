@@ -8,6 +8,7 @@ import loginService from './services/login'
 import Togglable from './components/Togglable'
 import { SuscessMessage, ErrorMessage } from './components/Notification'
 import { suscessNotification } from './reducers/suscessReducer'
+import { errorNotification } from './reducers/errorReducer'
 
 
 const App = () => {
@@ -17,7 +18,7 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [errorMessage, setErrorMessage] = useState('')
+
 
   const blogFormRef = useRef()
 
@@ -75,15 +76,14 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (ex) {
-      setErrorMessage('Wrong user name or password')
-      setTimeout(() => {setErrorMessage(null)}, 5000)
+      dispatch(errorNotification('Wrong username or password', 5000))
     }
   }
 
   if(user === null) {
     return (
       <>
-        <ErrorMessage errorMessage={errorMessage} />
+        <ErrorMessage />
         <Togglable buttonLabel='login' cancelLabel='cancel'>
           <form onSubmit={handleLogin}>
             <div>

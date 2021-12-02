@@ -12,8 +12,9 @@ export const SuscessMessage = () => {
   )
 }
 
-export const ErrorMessage = ({ errorMessage }) => {
-  if(errorMessage === '') return null
+export const ErrorMessage = () => {
+  const errorMessage = useSelector(state => state.errorMess)
+  if(errorMessage === null) return null
   return (
     <div className="error">
       {errorMessage}
