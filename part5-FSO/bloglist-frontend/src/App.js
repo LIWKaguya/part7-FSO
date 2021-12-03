@@ -4,20 +4,20 @@ import { useDispatch, useSelector } from 'react-redux'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
-import loginService from './services/login'
 import Togglable from './components/Togglable'
 import { SuscessMessage, ErrorMessage } from './components/Notification'
 import { suscessNotification } from './reducers/suscessReducer'
 import { errorNotification } from './reducers/errorReducer'
 import { initBlogs, likeBlog, removeBlog, createBlog } from './reducers/blogsReducer'
+import { initUser, logOut, setUser } from './reducers/userReducer'
 
 
 const App = () => {
   const dispatch = useDispatch()
   const blogs = useSelector(state => state.blogs)
+  const user = useSelector(state => state.user)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
 
 
   const blogFormRef = useRef()
@@ -27,13 +27,8 @@ const App = () => {
   }, [dispatch])
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogsUser')
-    if(loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
-    }
-  }, [])
+    dispatch(initUser())
+  }, [dispatch])
 
   const comp = (a, b) => {
     if(a.likes > b.likes) return -1
@@ -62,14 +57,7 @@ const App = () => {
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
-      const userLogin = await loginService.login({
-        username, password
-      })
-      blogService.setToken(userLogin.token)
-      setUser(userLogin)
-      window.localStorage.setItem(
-        'loggedBlogsUser', JSON.stringify(userLogin)
-      )
+      dispatch(setUser(username, password))
       setUsername('')
       setPassword('')
     } catch (ex) {
@@ -115,8 +103,7 @@ const App = () => {
       <h2>blogs</h2>
       {user.username} logged in
       <button id='logout' onClick={() => {
-        window.localStorage.clear()
-        setUser(null)
+        dispatch(logOut())
       }}>log out</button>
       <Togglable buttonLabel='create new blog' cancelLabel='cancel' ref={blogFormRef}>
         <BlogForm addBlog={addBlog} />
