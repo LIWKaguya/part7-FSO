@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 /* eslint-disable no-unused-vars */
 import './index.css'
 import React, { useState, useEffect, useRef } from 'react'
@@ -12,15 +13,9 @@ import { suscessNotification } from './reducers/suscessReducer'
 import { errorNotification } from './reducers/errorReducer'
 import { initBlogs, likeBlog, removeBlog, createBlog } from './reducers/blogsReducer'
 import { initUser, logOut, setUser } from './reducers/userReducer'
-import { Switch, Route } from 'react-router-dom'
+import { Switch, Route, Link, useParams } from 'react-router-dom'
 
-const Users = () => {
-  const [users, setUsers] = useState([])
-  useEffect(() => {
-    userService.getAll().then(response => {
-      setUsers(response)
-    })
-  })
+const Users = ({ users }) => {
   return (
     <>
       <h2>Users</h2>
@@ -34,12 +29,36 @@ const Users = () => {
         <tbody>
           {users.map(user =>
             <tr key={user.id}>
-              <td>{user.username}</td>
+              <td><Link to={`/users/${user.id}`}>{user.username}</Link></td>
               <td>{user.blogs.length}</td>
             </tr>)}
         </tbody>
       </table>
     </>
+  )
+}
+
+const User = ({ users }) => {
+  const id = useParams().id
+  const user = users.find(u => u.id === id)
+  if(!user) return null
+  return (
+    <>
+      <h2>{user.username}</h2>
+      <h3>Added blogs</h3>
+      <ul>
+        {user.blogs.map(blog => <li key={blog.id}>{blog.title}</li>)}
+      </ul>
+    </>
+  )
+}
+
+const BlogRoute = ({ blogs, updateBlog, deleteBlog, currentUser }) => {
+  const id = useParams().id
+  const blog = blogs.find(b => b.id === id)
+  if(!blog) return null
+  return (
+    <Blog blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} currentUser={currentUser} />
   )
 }
 
@@ -49,7 +68,12 @@ const App = () => {
   const user = useSelector(state => state.user)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-
+  const [users, setUsers] = useState([])
+  useEffect(() => {
+    userService.getAll().then(response => {
+      setUsers(response)
+    })
+  }, [])
 
   const blogFormRef = useRef()
 
@@ -96,6 +120,15 @@ const App = () => {
     }
   }
 
+  const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5
+  }
+
+
   if(user === null) {
     return (
       <>
@@ -137,16 +170,22 @@ const App = () => {
         dispatch(logOut())
       }}>log out</button>
       <Switch>
+        <Route path='/users/:id'>
+          <User users={users}/>
+        </Route>
         <Route path='/users'>
-          <Users />
+          <Users users={users}/>
+        </Route>
+        <Route path='/blogs/:id'>
+          <BlogRoute blogs={blogs} updateBlog={updateBlog} deleteBlog={deleteBlog} currentUser={user}/>
         </Route>
         <Route path='/'>
           <Togglable buttonLabel='create new blog' cancelLabel='cancel' ref={blogFormRef}>
             <BlogForm addBlog={addBlog} />
           </Togglable>
           {blogs.map(blog =>
-            <div key={blog.id} className='blog'>
-              <Blog blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} currentUser={user}/>
+            <div key={blog.id} style={blogStyle}>
+              <Link to={`/blogs/${blog.id}`}>{blog.title} by {blog.author}</Link>
             </div>
           )}
         </Route>
