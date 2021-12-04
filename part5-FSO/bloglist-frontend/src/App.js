@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import './index.css'
 import React, { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -5,12 +6,42 @@ import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import Togglable from './components/Togglable'
+import userService from './services/users'
 import { SuscessMessage, ErrorMessage } from './components/Notification'
 import { suscessNotification } from './reducers/suscessReducer'
 import { errorNotification } from './reducers/errorReducer'
 import { initBlogs, likeBlog, removeBlog, createBlog } from './reducers/blogsReducer'
 import { initUser, logOut, setUser } from './reducers/userReducer'
+import { Switch, Route } from 'react-router-dom'
 
+const Users = () => {
+  const [users, setUsers] = useState([])
+  useEffect(() => {
+    userService.getAll().then(response => {
+      setUsers(response)
+    })
+  })
+  return (
+    <>
+      <h2>Users</h2>
+      <table>
+        <thead>
+          <tr>
+            <td></td>
+            <td><b>blogs created</b></td>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map(user =>
+            <tr key={user.id}>
+              <td>{user.username}</td>
+              <td>{user.blogs.length}</td>
+            </tr>)}
+        </tbody>
+      </table>
+    </>
+  )
+}
 
 const App = () => {
   const dispatch = useDispatch()
@@ -98,22 +129,29 @@ const App = () => {
     )
   }
   return (
-    <div>
+    <>
       <SuscessMessage />
       <h2>blogs</h2>
       {user.username} logged in
       <button id='logout' onClick={() => {
         dispatch(logOut())
       }}>log out</button>
-      <Togglable buttonLabel='create new blog' cancelLabel='cancel' ref={blogFormRef}>
-        <BlogForm addBlog={addBlog} />
-      </Togglable>
-      {blogs.map(blog =>
-        <div key={blog.id} className='blog'>
-          <Blog blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} currentUser={user}/>
-        </div>
-      )}
-    </div>
+      <Switch>
+        <Route path='/users'>
+          <Users />
+        </Route>
+        <Route path='/'>
+          <Togglable buttonLabel='create new blog' cancelLabel='cancel' ref={blogFormRef}>
+            <BlogForm addBlog={addBlog} />
+          </Togglable>
+          {blogs.map(blog =>
+            <div key={blog.id} className='blog'>
+              <Blog blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} currentUser={user}/>
+            </div>
+          )}
+        </Route>
+      </Switch>
+    </>
   )
 }
 
