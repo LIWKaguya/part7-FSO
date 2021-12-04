@@ -13,7 +13,7 @@ import { suscessNotification } from './reducers/suscessReducer'
 import { errorNotification } from './reducers/errorReducer'
 import { initBlogs, likeBlog, removeBlog, createBlog } from './reducers/blogsReducer'
 import { initUser, logOut, setUser } from './reducers/userReducer'
-import { Switch, Route, Link, useParams } from 'react-router-dom'
+import { Switch, Route, Link, useParams, useHistory } from 'react-router-dom'
 
 const Users = ({ users }) => {
   return (
@@ -59,6 +59,23 @@ const BlogRoute = ({ blogs, updateBlog, deleteBlog, currentUser }) => {
   if(!blog) return null
   return (
     <Blog blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} currentUser={currentUser} />
+  )
+}
+
+const MenuNav = ({ user }) => {
+  const dispatch = useDispatch()
+  const padding = {
+    padding: 5,
+  }
+  return (
+    <div style={{ backgroundColor: 'gray' }}>
+      <Link to='/' style={padding}>blogs</Link>
+      <Link to='users' style={padding}>users</Link>
+      {user.username} logged in
+      <button id='logout' onClick={() => {
+        dispatch(logOut())
+      }}>log out</button>
+    </div>
   )
 }
 
@@ -164,11 +181,8 @@ const App = () => {
   return (
     <>
       <SuscessMessage />
-      <h2>blogs</h2>
-      {user.username} logged in
-      <button id='logout' onClick={() => {
-        dispatch(logOut())
-      }}>log out</button>
+      <MenuNav user={user}/>
+      <h2>blog app</h2>
       <Switch>
         <Route path='/users/:id'>
           <User users={users}/>
