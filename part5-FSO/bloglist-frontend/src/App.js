@@ -11,9 +11,9 @@ import userService from './services/users'
 import { SuscessMessage, ErrorMessage } from './components/Notification'
 import { suscessNotification } from './reducers/suscessReducer'
 import { errorNotification } from './reducers/errorReducer'
-import { initBlogs, likeBlog, removeBlog, createBlog } from './reducers/blogsReducer'
+import { initBlogs, likeBlog, removeBlog, createBlog, disCommentBlog } from './reducers/blogsReducer'
 import { initUser, logOut, setUser } from './reducers/userReducer'
-import { Switch, Route, Link, useParams, useHistory } from 'react-router-dom'
+import { Switch, Route, Link, useParams } from 'react-router-dom'
 
 const Users = ({ users }) => {
   return (
@@ -53,12 +53,12 @@ const User = ({ users }) => {
   )
 }
 
-const BlogRoute = ({ blogs, updateBlog, deleteBlog, currentUser }) => {
+const BlogRoute = ({ blogs, updateBlog, deleteBlog, currentUser, commentingBlog }) => {
   const id = useParams().id
   const blog = blogs.find(b => b.id === id)
   if(!blog) return null
   return (
-    <Blog blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} currentUser={currentUser} />
+    <Blog blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} currentUser={currentUser} commentingBlog={commentingBlog}/>
   )
 }
 
@@ -126,6 +126,10 @@ const App = () => {
     dispatch(suscessNotification(`blog ${deletedOne.title} by ${deletedOne.author} has been deleted`, 5000))
   }
 
+  const commentingBlog = async blogObj => {
+    dispatch(disCommentBlog(blogObj))
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
@@ -191,7 +195,7 @@ const App = () => {
           <Users users={users}/>
         </Route>
         <Route path='/blogs/:id'>
-          <BlogRoute blogs={blogs} updateBlog={updateBlog} deleteBlog={deleteBlog} currentUser={user}/>
+          <BlogRoute blogs={blogs} updateBlog={updateBlog} deleteBlog={deleteBlog} currentUser={user} commentingBlog={commentingBlog}/>
         </Route>
         <Route path='/'>
           <Togglable buttonLabel='create new blog' cancelLabel='cancel' ref={blogFormRef}>
