@@ -23,6 +23,7 @@ const Blog = ({ blog, updateBlog, deleteBlog, currentUser, commentingBlog }) => 
     event.preventDefault()
     commentingBlog({
       id: blog.id,
+      author: blog.author,
       comment
     })
     setComment('')

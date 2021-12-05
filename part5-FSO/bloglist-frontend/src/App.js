@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-undef */
 /* eslint-disable quotes */
 /* eslint-disable no-unused-vars */
 import './index.css'
@@ -183,7 +184,7 @@ const App = () => {
     )
   }
   return (
-    <>
+    <div className='container'>
       <SuscessMessage />
       <MenuNav user={user}/>
       <h2>blog app</h2>
@@ -208,7 +209,7 @@ const App = () => {
           )}
         </Route>
       </Switch>
-    </>
+    </div>
   )
 }
 
