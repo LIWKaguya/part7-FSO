@@ -22,6 +22,12 @@ const likeBlog = async object => {
   return response.data
 }
 
+const commentBlog = async object => {
+  const updated = { ...object, comments: object.comments.concat(object.comment) }
+  const response = await axios.put(`${baseUrl}/${object.id}`, updated)
+  return response.data
+}
+
 const upload = async object => {
   const config = {
     headers: { Authorization: token }
@@ -41,5 +47,5 @@ const clearOut = async object => {
   }
 }
 
-const object = { getAll, setToken, upload, likeBlog, clearOut, getOne }
+const object = { getAll, setToken, upload, likeBlog, clearOut, getOne, commentBlog }
 export default object
