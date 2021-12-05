@@ -59,10 +59,10 @@ export const removeBlog = (id) => {
   }
 }
 
-export const disCommentBlog = ({ comment, id, author }) => {
+export const disCommentBlog = ({ comment, id, author, likes }) => {
   return async dispatch => {
     const needBlog = await blogService.getOne({ id })
-    const commentedBlog = await blogService.commentBlog({ needBlog, comment, author })
+    const commentedBlog = await blogService.commentBlog({ needBlog, comment, author, likes })
     dispatch({
       type: 'COMMENT',
       data: commentedBlog

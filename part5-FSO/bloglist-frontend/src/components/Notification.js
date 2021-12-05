@@ -22,6 +22,6 @@ export const ErrorMessage = () => {
   )
 }
 
-const notification = [ErrorMessage, SuscessMessage]
+const notification = { ErrorMessage, SuscessMessage }
 
 export default notification

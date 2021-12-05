@@ -24,6 +24,7 @@ const Blog = ({ blog, updateBlog, deleteBlog, currentUser, commentingBlog }) => 
     commentingBlog({
       id: blog.id,
       author: blog.author,
+      likes: blog.likes,
       comment
     })
     setComment('')

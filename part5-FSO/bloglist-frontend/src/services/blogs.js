@@ -23,7 +23,7 @@ const likeBlog = async object => {
 }
 
 const commentBlog = async object => {
-  const updated = { ...object.blog, comments: object.needBlog.comments.concat([object.comment]), author: object.author }
+  const updated = { ...object.blog, comments: object.needBlog.comments.concat([object.comment]), author: object.author, likes: object.likes }
   const response = await axios.put(`${baseUrl}/${object.needBlog.id}`, updated)
   return response.data
 }

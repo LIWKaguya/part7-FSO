@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-no-undef */
 /* eslint-disable quotes */
 /* eslint-disable no-unused-vars */
+import { Table, Form, Button } from 'react-bootstrap'
 import './index.css'
 import React, { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -71,7 +72,7 @@ const MenuNav = ({ user }) => {
   return (
     <div style={{ backgroundColor: 'gray' }}>
       <Link to='/' style={padding}>blogs</Link>
-      <Link to='users' style={padding}>users</Link>
+      <Link to='/users' style={padding}>users</Link>
       {user.username} logged in
       <button id='logout' onClick={() => {
         dispatch(logOut())
@@ -133,23 +134,13 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    try {
+    try{
       dispatch(setUser(username, password))
-      setUsername('')
-      setPassword('')
-    } catch (ex) {
-      dispatch(errorNotification('Wrong username or password', 5000))
+    } catch(ex) {
+      console.log('b')
+      dispatch(errorNotification('wrong', 5000))
     }
   }
-
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
-  }
-
 
   if(user === null) {
     return (
@@ -157,16 +148,14 @@ const App = () => {
         <ErrorMessage />
         <Togglable buttonLabel='login' cancelLabel='cancel'>
           <form onSubmit={handleLogin}>
-            <div>
-              username
-              <input
-                type="text"
-                id='username'
-                value={username}
-                name="Username"
-                onChange={({ target }) => setUsername(target.value)}
-              />
-            </div>
+            username
+            <input
+              type="text"
+              id='username'
+              value={username}
+              name="Username"
+              onChange={({ target }) => setUsername(target.value)}
+            />
             <div>
               password
               <input
@@ -177,7 +166,7 @@ const App = () => {
                 onChange={({ target }) => setPassword(target.value)}
               />
             </div>
-            <button type="submit" id='login-button'>login</button>
+            <button variant='primary' type='submit'>login</button>
           </form>
         </Togglable>
       </>
@@ -202,11 +191,16 @@ const App = () => {
           <Togglable buttonLabel='create new blog' cancelLabel='cancel' ref={blogFormRef}>
             <BlogForm addBlog={addBlog} />
           </Togglable>
-          {blogs.map(blog =>
-            <div key={blog.id} style={blogStyle}>
-              <Link to={`/blogs/${blog.id}`}>{blog.title} by {blog.author}</Link>
-            </div>
-          )}
+          <Table striped>
+            <tbody>
+              {blogs.map(blog =>
+                <tr key={blog.id}>
+                  <td><Link to={`/blogs/${blog.id}`}>{blog.title} by {blog.author}</Link></td>
+                  <td>{blog.user.username}</td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
         </Route>
       </Switch>
     </div>
